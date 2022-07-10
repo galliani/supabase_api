@@ -2,13 +2,18 @@
 
 module SupabaseApi
   class Record
-    def self.table_endpoint
+    def self.table_name
       raise ArgumentError
     end
 
+    def self.all
+      # data = Client.new.list(table_name)
+      # data.each do |record|
+      # end
+    end
+
     def self.find(id)
-      data = Client.find(id)
-      
+      data = Client.new.get(table_name, id)
       new(data)
     end
 
@@ -26,7 +31,20 @@ module SupabaseApi
     end
 
     def save
-      Client.save(attributes)
+      client = Client.new
+
+      if id
+        client.update(
+          self.class.table_name,
+          id,
+          attributes
+        )
+      else
+        client.create(
+          self.class.table_name,
+          attributes
+        )
+      end
     end
   end
 end

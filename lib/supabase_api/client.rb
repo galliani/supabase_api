@@ -3,59 +3,86 @@
 require 'httparty'
 
 module SupabaseApi
-  module Client
+  class Client
     include HTTParty
-    base_uri ENV['SUPABASE_URL']
 
-    def self.authorizations
-      {
+    def self.base_url
+      SupabaseApi::Config.base_url
+    end
+
+    def self.api_version
+      SupabaseApi::Config.api_version || 'v1'
+    end
+
+    def initialize
+      @headers = {
         'apikey':         ENV['SUPABASE_KEY'],
         'Authorization':  "Bearer #{ENV['SUPABASE_KEY']}"
-      }      
+      }
     end
 
-    def self.filtered_by_id_endpoint(id)
-      "#{self.table_endpoint}?id=eq.#{id}&select=*"
-    end
-
-    def self.find(id)
-      response = self.get(
-        filtered_by_id_endpoint(id),
-        headers: authorizations.merge({
+    def list(table_name)
+      self.class.get(
+        self.class.list_endpoint(table_name),
+        headers: @headers.merge({
           'Range': '0-9'
         })
       )
-
-      JSON.parse(response.body).first
     end
 
-    def self.save(attributes)
-      options = {
-        body:     attributes.to_json,
-        headers:  Client.authorizations.merge({
+    def find(table_name, id)
+      self.class.get(
+        self.class.filtered_by_id_endpoint(table_name, id),
+        headers: @headers.merge({
+          'Range': '0-9'
+        })
+      )
+    end
+
+    def create(table_name, body)
+      self.class.post(
+        self.class.collection_endpoint(table_name),
+        body:     body.to_json,
+        headers:  @headers.merge({
           'Content-Type': 'application/json',
           'Prefer':       'return=representation'
         })
-      }
-
-      if @id.present?
-        response = Client.patch(
-          filtered_by_id_endpoint(@id),
-          options
-        )
-
-        response.success?
-      else
-        response = Client.post(
-          self.class.table_endpoint,
-          options
-        )
-
-        JSON.parse(response.body).first['id'].present?
-      end
+      )
     end
 
-    def self.delete
+    def update(table_name, id, body)
+      self.class.patch(
+        self.class.filtered_by_id_endpoint(table_name, id),
+        body:     body.to_json,
+        headers:  @headers.merge({
+          'Content-Type': 'application/json',
+          'Prefer':       'return=representation'
+        })
+      )
+    end
+
+    def destroy(table_name, id)
+      self.class.delete(
+        self.class.filtered_by_id_endpoint(table_name, id),
+        headers:  @headers.merge({
+          'Content-Type': 'application/json',
+          'Prefer':       'return=representation'
+        })
+      )      
+    end
+
+    private
+
+    def self.collection_endpoint(table_name)
+      base_url + "/rest/#{api_version}/#{table_name}"
+    end
+
+    def self.list_endpoint(table_name)
+      "#{collection_endpoint(table_name)}?select=*"
+    end
+
+    def self.filtered_by_id_endpoint(table_name, id)
+      "#{list_endpoint(table_name)}&id=eq.#{id}"
     end    
   end
 end

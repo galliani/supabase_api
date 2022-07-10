@@ -8,7 +8,8 @@ gemspec
 gem "rake", "~> 13.0"
 
 gem "rspec", "~> 3.0"
-
+gem "webmock"
 gem "rubocop", "~> 1.21"
 
 gem "dotenv"
+gem "byebug"
