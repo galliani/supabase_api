@@ -34,6 +34,8 @@ module SupabaseApi
     end
 
     def self.create(params)
+      is_multi_rows = params.kind_of? Array
+
       client = Client.new
       response = client.create(
         table_name,
@@ -41,8 +43,15 @@ module SupabaseApi
       )
 
       if response.success? && !response.parsed_response.empty?
-        new(response.parsed_response.first)
+        if is_multi_rows
+          response.parsed_response.map do |data|
+            new(data)
+          end
+        else
+          new(response.parsed_response.first)
+        end
       else
+        nil
       end      
     end
 

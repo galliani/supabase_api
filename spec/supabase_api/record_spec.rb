@@ -177,37 +177,102 @@ RSpec.describe SupabaseApi::Record do
   end
 
   describe ".create" do
-    let(:params) { { name: 'new record', status: 'active' } }
+    context 'single row' do
+      let(:params) { { name: 'new record', status: 'active' } }
 
-    context 'when successful' do
-      before do
-        @request_object = HTTParty::Request.new Net::HTTP::Post, '/'
-        @response_object = Net::HTTPCreated.new('1.1', 201, 'CREATED')
-        allow(@response_object).to receive_messages(body: [ params.merge(id: sample_id) ].to_json)
-
-        @parsed_response = lambda { [ params.merge(id: sample_id) ] }
-        @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
-
-        allow_any_instance_of(SupabaseApi::Client).to receive(:create).and_return(
-          @response
-        )        
+      context 'when not successful due to parameter' do
+        it "should call .create method of Client class"
+        it "should return nil"
       end
 
-      subject { described_class.create(params) }
+      context 'when successful' do
+        before do
+          @request_object = HTTParty::Request.new Net::HTTP::Post, '/'
+          @response_object = Net::HTTPCreated.new('1.1', 201, 'CREATED')
+          allow(@response_object).to receive_messages(body: [ params.merge(id: sample_id) ].to_json)
 
-      it "should call .create method of Client class" do
-        expect_any_instance_of(SupabaseApi::Client).to receive(:create).with(sample_table_name, params)
+          @parsed_response = lambda { [ params.merge(id: sample_id) ] }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
 
-        subject
-      end
+          allow_any_instance_of(SupabaseApi::Client).to receive(:create).and_return(
+            @response
+          )        
+        end
 
-      it "should return an instance of the class" do
-        record = subject
+        subject { described_class.create(params) }
 
-        expect(record.class).to eq described_class
-        expect(record.id).to eq described_class.new(id: sample_id).id
+        it "should call .create method of Client class" do
+          expect_any_instance_of(SupabaseApi::Client).to receive(:create).with(sample_table_name, params)
+
+          subject
+        end
+
+        it "should return an instance of the class" do
+          record = subject
+
+          expect(record.class).to eq described_class
+          expect(record.id).to eq described_class.new(id: sample_id).id
+        end
       end
     end
+
+    context 'multiple rows' do
+      let(:params) do
+        [
+          { name: 'new first row record', status: 'active' },
+          { name: 'new second row record', status: 'pending' }
+        ]
+      end
+
+      context 'when not successful due to parameter' do
+        it "should call .create method of Client class"
+        it "should return nil"
+      end
+
+      context 'when successful' do
+        let(:expected_output) do
+          params.each_with_index do |key_value, index|
+            key_value[:id] = index + 20
+          end
+
+          params
+        end
+
+        before do
+          @request_object = HTTParty::Request.new Net::HTTP::Post, '/'
+          @response_object = Net::HTTPCreated.new('1.1', 201, 'CREATED')
+          allow(@response_object).to receive_messages(body: expected_output.to_json)
+
+          @parsed_response = lambda { expected_output }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
+
+          allow_any_instance_of(SupabaseApi::Client).to receive(:create).and_return(
+            @response
+          )        
+        end
+
+        subject { described_class.create(params) }
+
+        it "should call .create method of Client class" do
+          expect_any_instance_of(SupabaseApi::Client).to receive(:create).with(sample_table_name, params)
+
+          subject
+        end
+
+        it "should return an array containing instances of the class" do
+          records = subject
+
+          expect(records.class).to eq Array
+
+          records.each do |record|
+            expect(record.class).to       eq described_class
+            expect(record.id).to_not      eq nil
+            expect(record.name).to_not    eq nil
+            expect(record.status).to_not  eq nil
+          end
+        end
+      end
+    end    
   end
 
   describe ".save" do
@@ -316,26 +381,4 @@ RSpec.describe SupabaseApi::Record do
       end
     end    
   end
-
-  # describe ".save" do
-  #   let(:sample) { described_class.new(name: 'new record') }
-
-  #   before do
-  #     allow(SupabaseApi::Client).to receive(:save).and_return(true)
-  #   end
-
-  #   subject { sample.save }
-
-  #   it "should call Client.save method" do
-  #     expect(SupabaseApi::Client).to receive(:save).with(
-  #       { :name => 'new record' }
-  #     )
-
-  #     subject
-  #   end
-
-  #   it "should return true indicating success" do
-  #     expect(subject).to eq true
-  #   end    
-  # end
 end
