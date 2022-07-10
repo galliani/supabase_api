@@ -1,7 +1,10 @@
 require 'spec_helper'
 
 RSpec.describe SupabaseApi::Client do
-  before { SupabaseApi::Config.base_url = 'https://thiswouldberandomstring.supabase.co' }
+  before do
+    SupabaseApi::Config.base_url  = 'https://thiswouldberandomstring.supabase.co'
+    SupabaseApi::Config.api_key   = 'verylongrandomkeystring123'
+  end
 
   let(:table_name)  { 'resources' }
   let(:sample_id)   { 2 }

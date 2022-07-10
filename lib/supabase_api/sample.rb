@@ -1,9 +1,9 @@
 # frozen_string_literal: true
 
 module SupabaseApi
-  class Config
+  class Sample < Record
     class << self
-      attr_accessor :base_url, :api_version, :api_key
+      attr_accessor :table_name
     end
   end
 end

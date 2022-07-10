@@ -14,10 +14,14 @@ module SupabaseApi
       SupabaseApi::Config.api_version || 'v1'
     end
 
+    def self.api_key
+      SupabaseApi::Config.api_key
+    end
+
     def initialize
       @headers = {
-        'apikey':         ENV['SUPABASE_KEY'],
-        'Authorization':  "Bearer #{ENV['SUPABASE_KEY']}"
+        'apikey':         self.class.api_key,
+        'Authorization':  "Bearer #{self.class.api_key}"
       }
     end
 

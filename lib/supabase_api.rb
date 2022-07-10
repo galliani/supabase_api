@@ -3,6 +3,7 @@
 require_relative "supabase_api/config"
 require_relative "supabase_api/client"
 require_relative "supabase_api/record"
+require_relative "supabase_api/sample"
 require_relative "supabase_api/version"
 
 module SupabaseApi
