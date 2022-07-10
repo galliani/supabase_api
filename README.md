@@ -8,18 +8,23 @@ DISCLAIMER: This is not an official Ruby SDK.
 
 Install the gem and add to the application's Gemfile by executing:
 
-    $ bundle add supabase_api
+```bash
+$ bundle add supabase_api
+```
 
 If bundler is not being used to manage dependencies, install the gem by executing:
 
-    $ gem install supabase_api
+```bash
+$ gem install supabase_api
+```
 
 ## Usage
 
 
 ### Setup
 Run these commands on the config or initializer file.
-```
+
+```ruby
 # setups
 require 'supabase_api' # if not using Rails
 SupabaseApi::Sample.base_url = 'https://yourrandomapisubdomain.supabase.co'
@@ -29,7 +34,7 @@ SupabaseApi::Sample.api_key = 'veryrandomlongstring'
 ### With Rails
 Create a ruby PORO class for your Supabase tables and inherit from the `SupabaseApi::Record` class.
 
-```
+```ruby
 class Book < SupabaseApi::Record
   def self.table_name
     # put the name of the table you want to connect with from Supabase
@@ -40,7 +45,7 @@ end
 
 Then after that you can access your Supabase table just like a `ActiveRecord`-backed models.
 
-```
+```ruby
 book_id_in_supabase = 100
 Book.find(book_id_in_supabase)
 
@@ -70,7 +75,7 @@ book.destroy
 Book.find(100) # will raise an exception SupabaseApi::RecordNotFound
 ```
 
-## TODO
+## TODO List
 - add pagination.
 - add command `.where` for the Record class to be able to query the table.
 - add command `.update` for the Record instance.
