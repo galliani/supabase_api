@@ -6,10 +6,9 @@ Gem::Specification.new do |spec|
   spec.name = "supabase_api"
   spec.version = SupabaseApi::VERSION
   spec.authors = ["Galih Muhammad"]
-  spec.email = ["galih0muhammad@gmail.com"]
+  spec.email = ["galih.rubyist@gmail.com"]
 
-  spec.summary = "Write a short summary, because RubyGems requires one."
-  spec.description = "Write a longer description or delete this line."
+  spec.summary = "A ruby client for Supabase tables to be consumed as ruby class via the REST API"
   spec.homepage = "https://github.com/galliani/supabase_api"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 2.6.0"
