@@ -6,7 +6,6 @@ Gem::Specification.new do |spec|
   spec.name = "supabase_api"
   spec.version = SupabaseApi::VERSION
   spec.authors = ["Galih Muhammad"]
-  spec.email = ["galih.rubyist@gmail.com"]
 
   spec.summary = "A ruby client for Supabase tables to be consumed as ruby class via the REST API"
   spec.homepage = "https://github.com/galliani/supabase_api"
@@ -32,7 +31,4 @@ Gem::Specification.new do |spec|
 
   # Uncomment to register a new dependency of your gem
   spec.add_dependency "httparty"
-
-  # For more information and examples about making a new gem, check out our
-  # guide at: https://bundler.io/guides/creating_gem.html
 end

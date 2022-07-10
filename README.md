@@ -1,8 +1,8 @@
 # SupabaseApi
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/supabase_api`. To experiment with that code, run `bin/console` for an interactive prompt.
+Hi, this is a Ruby wrapper to access your Supabase tables via REST API in a manner similar to ActiveRecord model.
 
-TODO: Delete this and the text above, and describe your gem
+DISCLAIMER: This is not an official Ruby SDK.
 
 ## Installation
 
@@ -16,7 +16,67 @@ If bundler is not being used to manage dependencies, install the gem by executin
 
 ## Usage
 
-TODO: Write usage instructions here
+
+### Setup
+Run these commands on the config or initializer file.
+```
+# setups
+require 'supabase_api' # if not using Rails
+SupabaseApi::Sample.base_url = 'https://yourrandomapisubdomain.supabase.co'
+SupabaseApi::Sample.api_key = 'veryrandomlongstring'
+```
+
+### With Rails
+Create a ruby PORO class for your Supabase tables and inherit from the `SupabaseApi::Record` class.
+
+```
+class Book < SupabaseApi::Record
+  def self.table_name
+    # put the name of the table you want to connect with from Supabase
+    'books' # or 'Books', whatever you fancy
+  end
+end
+```
+
+Then after that you can access your Supabase table just like a `ActiveRecord`-backed models.
+
+```
+book_id_in_supabase = 100
+Book.find(book_id_in_supabase)
+
+# The line below will yield the same like above but will not raise any exception
+book = Book.find_by_id(book_id_in_supabase)
+
+# Assuming the books table has 'status' string column
+book.status = 'archived'
+book.save
+
+# If you want to create a new book record
+new_book = Book.new(
+  name: 'New Book',
+  status: 'pending'
+)
+new_book.save
+
+# or
+book = Book.create(
+  name: 'New Book',
+  status: 'pending'
+)
+book.id # => 100
+
+# In case you regret creating it, you can delete the record
+book.destroy
+Book.find(100) # will raise an exception SupabaseApi::RecordNotFound
+```
+
+## TODO
+- add pagination.
+- add command `.where` for the Record class to be able to query the table.
+- add command `.update` for the Record instance.
+- add command `#update` for the Record class to have multiple upserts.
+- add more graceful and robust error handler.
+
 
 ## Development
 
