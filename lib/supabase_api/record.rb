@@ -7,20 +7,52 @@ module SupabaseApi
     end
 
     def self.all
-      # data = Client.new.list(table_name)
-      # data.each do |record|
-      # end
+      output = []
+
+      response = Client.new.list(table_name)
+      response.parsed_response.each do |record_hash|
+        output << new(record_hash)
+      end
+
+      output
     end
 
     def self.find(id)
-      data = Client.new.get(table_name, id)
-      new(data)
+      response = Client.new.find(table_name, id)
+
+      if response.success? && !response.parsed_response.empty?
+        new(response.parsed_response.first)
+      else
+        raise RecordNotFound
+      end
     end
 
-    attr_accessor :id
+    def self.find_by_id(id)
+      find(id)
+    rescue RecordNotFound
+      nil
+    end
+
+    def self.create(params)
+      client = Client.new
+      response = client.create(
+        table_name,
+        params
+      )
+
+      if response.success? && !response.parsed_response.empty?
+        new(response.parsed_response.first)
+      else
+      end      
+    end
+
+    attr_reader :id
 
     def initialize(params = {})
-      params.each { |key,value| instance_variable_set("@#{key}", value) }
+      params.each do |key,value|
+        instance_variable_set("@#{key}", value)
+      end
+
       instance_variables.each {|var| self.class.send(:attr_accessor, var.to_s.delete('@'))}
     end
 
@@ -30,21 +62,36 @@ module SupabaseApi
       end
     end
 
-    def save
-      client = Client.new
+    def assign_attributes(params = {})
+      params.each do |key,value|
+        instance_variable_set("@#{key}", value)
+      end      
+    end
 
-      if id
-        client.update(
+    def save
+      if id.nil?
+        self.class.create(attributes)
+      else
+        response = Client.new.update(
           self.class.table_name,
           id,
           attributes
         )
-      else
-        client.create(
-          self.class.table_name,
-          attributes
-        )
+        self.class.new(response.parsed_response.first)
       end
     end
+
+    def destroy
+      raise InvalidRequest if id.nil?
+
+      response = Client.new.destroy(
+        self.class.table_name,
+        id
+      )
+      
+      return true if response.success?
+
+      raise RecordNotDestroyed
+    end    
   end
 end

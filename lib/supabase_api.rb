@@ -7,4 +7,7 @@ require_relative "supabase_api/version"
 
 module SupabaseApi
   class Error < StandardError; end
+  class InvalidRequest < Error; end
+  class RecordNotFound < Error; end
+  class RecordNotDestroyed < Error; end
 end
