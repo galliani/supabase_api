@@ -27,8 +27,8 @@ Run these commands on the config or initializer file.
 ```ruby
 # setups
 require 'supabase_api' # if not using Rails
-SupabaseApi::Sample.base_url = 'https://yourrandomapisubdomain.supabase.co'
-SupabaseApi::Sample.api_key = 'veryrandomlongstring'
+SupabaseApi::Config.base_url = 'https://yourrandomapisubdomain.supabase.co'
+SupabaseApi::Config.api_key = 'veryrandomlongstring'
 ```
 
 ### With Rails
