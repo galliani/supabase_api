@@ -1,4 +1,4 @@
-# SupabaseApi ![Build Status](https://github.com/galliani/supabase_api/workflows/spec/badge.svg)] [![Gem](https://rubygems.org/gems/supabase_api)]
+# SupabaseApi [![Gem](https://img.shields.io/gem/v/supabase_api?color=blue&label=version)](https://rubygems.org/gems/supabase_api) ![Build Status](https://github.com/galliani/supabase_api/workflows/spec/badge.svg)] [![Commit](https://img.shields.io/github/last-commit/galliani/supabase_api)] 
 
 
 Hi, this is a Ruby wrapper to access your Supabase tables via REST API in a manner similar to ActiveRecord model.
