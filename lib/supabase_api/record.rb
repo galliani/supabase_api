@@ -7,14 +7,19 @@ module SupabaseApi
     end
 
     def self.all
+      where()
+    end
+
+    def self.where(params = {})
       output = []
 
-      response = Client.new.list(table_name)
+      response = Client.new.list(table_name, params)
+
       response.parsed_response.each do |record_hash|
         output << new(record_hash)
       end
 
-      output
+      output      
     end
 
     def self.find(id)

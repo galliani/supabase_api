@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'httparty'
+require 'rack'
 
 module SupabaseApi
   class Client
@@ -25,9 +26,9 @@ module SupabaseApi
       }
     end
 
-    def list(table_name)
+    def list(table_name, params = {})
       self.class.get(
-        self.class.list_endpoint(table_name),
+        self.class.list_endpoint(table_name, params),
         headers: @headers.merge({
           'Range': '0-9'
         })
@@ -81,8 +82,16 @@ module SupabaseApi
       base_url + "/rest/#{api_version}/#{table_name}"
     end
 
-    def self.list_endpoint(table_name)
-      "#{collection_endpoint(table_name)}?select=*"
+    def self.list_endpoint(table_name, params = {})
+      if params
+        query_string = Rack::Utils.build_query(params)
+        adjusted_query_string = query_string.gsub('=','=eq.')
+      end
+
+      url = "#{collection_endpoint(table_name)}?select=*"
+      return url if adjusted_query_string.nil? || adjusted_query_string.empty?
+
+      url + '&' + adjusted_query_string
     end
 
     def self.filtered_by_id_endpoint(table_name, id)

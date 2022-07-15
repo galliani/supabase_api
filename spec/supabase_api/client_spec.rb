@@ -17,31 +17,66 @@ RSpec.describe SupabaseApi::Client do
       ]
     end
 
-    subject { described_class.new.list(table_name) }
+    subject { described_class.new.list(table_name, params) }
 
-    before do
-      @stub = stub_request(:get, described_class.list_endpoint(table_name)).
-        to_return(
-          status: 200,
-          body: stubbed_body.to_json
-        )
+    context 'without any filter params' do
+      let(:params) { {} }
+
+      before do
+        @stub = stub_request(:get, described_class.list_endpoint(table_name)).
+          to_return(
+            status: 200,
+            body: stubbed_body.to_json
+          )
+      end
+
+      it 'should send GET request unfiltered' do
+        subject
+
+        expect(@stub).to have_been_requested
+      end
+
+      it 'should return an HTTParty Response instance' do
+        expect(subject.class).to eq HTTParty::Response
+      end
+
+      it 'should have the returned body accessible' do
+        response = JSON.parse(subject.body).first
+
+        response.each do |key, value|
+          expect(response[key]).to eq stubbed_body.first[key.to_sym]
+        end
+      end
     end
 
-    it 'should send GET request unfiltered' do
-      subject
+    context 'with filter params' do
+      let(:matching_record) { stubbed_body.last }
+      let(:params) { { name: matching_record['name'] } }
 
-      expect(@stub).to have_been_requested
-    end
+      before do
+        @stub = stub_request(:get, described_class.list_endpoint(table_name, params)).
+          to_return(
+            status: 200,
+            body: [matching_record].to_json
+          )
+      end
 
-    it 'should return an HTTParty Response instance' do
-      expect(subject.class).to eq HTTParty::Response
-    end
+      it 'should send GET request FILTERED' do
+        subject
 
-    it 'should have the returned body accessible' do
-      response = JSON.parse(subject.body).first
+        expect(@stub).to have_been_requested
+      end
 
-      response.each do |key, value|
-        expect(response[key]).to eq stubbed_body.first[key.to_sym]
+      it 'should return an HTTParty Response instance' do
+        expect(subject.class).to eq HTTParty::Response
+      end
+
+      it 'should have the returned body accessible' do
+        response = JSON.parse(subject.body).first
+
+        response.each do |key, value|
+          expect(response[key]).to eq matching_record[key.to_sym]
+        end
       end
     end
   end

@@ -162,7 +162,7 @@ RSpec.describe SupabaseApi::Record do
       end
 
       it "should call .list method of Client class" do
-        expect_any_instance_of(SupabaseApi::Client).to receive(:list).with(sample_table_name)
+        expect_any_instance_of(SupabaseApi::Client).to receive(:list).with(sample_table_name, {})
 
         subject
       end
@@ -172,6 +172,122 @@ RSpec.describe SupabaseApi::Record do
 
         expect(record.class).to eq Array
         expect(record.first.class).to eq described_class
+      end
+    end    
+  end
+
+  describe "#where" do
+    subject { described_class.where(params) }
+
+    context 'without any parameter' do
+      let(:params) { {} }
+
+      context 'with record NOT found' do
+        before do
+          @request_object   = HTTParty::Request.new Net::HTTP::Get, '/'
+          @response_object  = Net::HTTPOK.new('1.1', 200, 'OK')
+          allow(@response_object).to receive_messages(body: [].to_json)
+
+          @parsed_response = lambda { [] }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
+
+          allow_any_instance_of(SupabaseApi::Client).to receive(:list).with(described_class.table_name, params).and_return(
+            @response
+          )
+        end
+
+        it "should NOT raise an exception" do
+          expect { subject }.to_not raise_error(SupabaseApi::RecordNotFound)
+        end
+
+        it "should return an empty array" do
+          record = subject
+
+          expect(record.class).to eq Array
+        end      
+      end
+
+      context 'with record found' do
+        before do
+          @request_object = HTTParty::Request.new Net::HTTP::Get, '/'
+          @response_object = Net::HTTPOK.new('1.1', 200, 'OK')
+          allow(@response_object).to receive_messages(body: [{ id: sample_id }].to_json)
+          @parsed_response = lambda { [{ "id" => sample_id }] }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
+
+          allow_any_instance_of(SupabaseApi::Client).to receive(:list).with(described_class.table_name, params).and_return(
+            @response
+          )
+        end
+
+        it "should call .list method of Client class" do
+          expect_any_instance_of(SupabaseApi::Client).to receive(:list).with(sample_table_name, {})
+
+          subject
+        end
+
+        it "should return an array of instances of the class" do
+          record = subject
+
+          expect(record.class).to eq Array
+          expect(record.first.class).to eq described_class
+        end
+      end
+    end
+
+    context 'with parameter' do
+      let(:params) { { name: 'lorem' } }
+
+      context 'with record NOT found' do
+        before do
+          @request_object   = HTTParty::Request.new Net::HTTP::Get, '/'
+          @response_object  = Net::HTTPOK.new('1.1', 200, 'OK')
+          allow(@response_object).to receive_messages(body: [].to_json)
+
+          @parsed_response = lambda { [] }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
+
+          allow_any_instance_of(SupabaseApi::Client).to receive(:list).with(described_class.table_name, params).and_return(
+            @response
+          )
+        end
+
+        it "should NOT raise an exception" do
+          expect { subject }.to_not raise_error(SupabaseApi::RecordNotFound)
+        end
+
+        it "should return an empty array" do
+          record = subject
+
+          expect(record.class).to eq Array
+        end      
+      end
+
+      context 'with record found' do
+        before do
+          @request_object = HTTParty::Request.new Net::HTTP::Get, '/'
+          @response_object = Net::HTTPOK.new('1.1', 200, 'OK')
+          allow(@response_object).to receive_messages(body: [{ id: sample_id }].to_json)
+          @parsed_response = lambda { [{ "id" => sample_id }] }
+          @response = HTTParty::Response.new(@request_object, @response_object, @parsed_response)
+
+          allow_any_instance_of(SupabaseApi::Client).to receive(:list).with(described_class.table_name, params).and_return(
+            @response
+          )
+        end
+
+        it "should call .list method of Client class" do
+          expect_any_instance_of(SupabaseApi::Client).to receive(:list).with(sample_table_name, params)
+
+          subject
+        end
+
+        it "should return an array of instances of the class" do
+          record = subject
+
+          expect(record.class).to eq Array
+          expect(record.first.class).to eq described_class
+        end
       end
     end    
   end
