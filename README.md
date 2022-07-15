@@ -1,4 +1,5 @@
-# SupabaseApi
+# SupabaseApi ![Build Status](https://github.com/galliani/supabase_api/workflows/spec/badge.svg)] [![Gem](https://rubygems.org/gems/supabase_api)]
+
 
 Hi, this is a Ruby wrapper to access your Supabase tables via REST API in a manner similar to ActiveRecord model.
 
@@ -31,6 +32,17 @@ SupabaseApi::Config.base_url = 'https://yourrandomapisubdomain.supabase.co'
 SupabaseApi::Config.api_key = 'veryrandomlongstring'
 ```
 
+For production usage, of course it is recommended to use ENV variables manager like Figaro or Dotenv, which then will make your setup like this:
+```ruby
+# setups
+require 'supabase_api' # if not using Rails
+SupabaseApi::Config.base_url = ENV['SUPABASE_API_BASE_URL']
+SupabaseApi::Config.api_key = ENV['SUPABASE_API_KEY']
+```
+
+This setup should be called as early as need be. If using rails, you can put it under `config/initializers` directory inside a file named `supabase_api.rb` as per the usual convention.
+
+
 ### With Rails
 Create a ruby PORO class for your Supabase tables and inherit from the `SupabaseApi::Record` class.
 
@@ -45,12 +57,26 @@ end
 
 Then after that you can access your Supabase table just like a `ActiveRecord`-backed models.
 
+### Querying Data
 ```ruby
 book_id_in_supabase = 100
 Book.find(book_id_in_supabase)
 
 # The line below will yield the same like above but will not raise any exception
 book = Book.find_by_id(book_id_in_supabase)
+
+# or you could call .where
+Book.where(id: 100) # would yield the same result as above, also not raising exception
+
+# .where works like you expect, passing another key-value pair as arguments
+Book.where(name: 'some name of the book')
+
+```
+
+### Mutating Data
+
+```ruby
+book = Book.find(book_id_in_supabase)
 
 # Assuming the books table has 'status' string column
 book.status = 'archived'
@@ -77,9 +103,7 @@ Book.find(100) # will raise an exception SupabaseApi::RecordNotFound
 
 ## TODO List
 - add pagination.
-- add command `.where` for the Record class to be able to query the table.
-- add command `.update` for the Record instance.
-- add command `#update` for the Record class to have multiple upserts.
+- adapt command `#create` and `#update`  for the Record class to have multiple inserts and upserts respectively.
 - add more graceful and robust error handler.
 
 
