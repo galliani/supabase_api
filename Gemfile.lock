@@ -1,7 +1,7 @@
 PATH
   remote: .
   specs:
-    supabase_api (0.2.0)
+    supabase_api (0.3.0)
       httparty
       rack
 
