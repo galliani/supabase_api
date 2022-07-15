@@ -8,6 +8,9 @@ gemspec
 gem "rake", "~> 13.0"
 
 gem "rspec", "~> 3.0"
+gem 'simplecov', require: false, group: :test
+gem 'simplecov-shields-badge', require: false
+
 gem "webmock"
 gem "rubocop", "~> 1.21"
 
