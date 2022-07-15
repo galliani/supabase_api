@@ -1,27 +1,29 @@
-name: Ruby
+env:
+  RUBY_VERSION: 2.6
 
-on:
-  push:
-    branches:
-      - master
-
-  pull_request:
-
+name: spec
+on: [push, pull_request]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    name: Ruby ${{ matrix.ruby }}
-    strategy:
-      matrix:
-        ruby:
-          - '3.1.2'
-
+  rspec-test:
+    name: RSpec
+    runs-on: ubuntu-18.04
     steps:
-    - uses: actions/checkout@v3
-    - name: Set up Ruby
-      uses: ruby/setup-ruby@v1
-      with:
-        ruby-version: ${{ matrix.ruby }}
-        bundler-cache: true
-    - name: Run the default task
-      run: bundle exec rake
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: ${{ env.RUBY_VERSION }}
+      - name: Install gem dependencies
+        run: |
+          gem install bundler
+          bundler install
+      - name: Run tests
+        run: bundler exec rspec
+      - name: Upload coverage results    
+        uses: actions/upload-artifact@master
+        if: always()
+        with:
+          name: my-artifact
+          path: |
+            ${{ github.workspace }}/coverage
+      - name: Download all workflow run artifacts
+        uses: actions/download-artifact@v2
