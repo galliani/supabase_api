@@ -91,7 +91,7 @@ RSpec.describe SupabaseApi::Client do
     subject { described_class.new.find(table_name, sample_id) }
 
     before do
-      @stub = stub_request(:get, described_class.filtered_by_id_endpoint(table_name, sample_id)).
+      @stub = stub_request(:get, described_class.list_endpoint(table_name, { id: sample_id })).
         to_return(
           status: 200,
           body: stubbed_body.to_json
@@ -168,7 +168,7 @@ RSpec.describe SupabaseApi::Client do
       subject { described_class.new.update(table_name, sample_id, request_body) }
 
       before do
-        @stub = stub_request(:patch, described_class.filtered_by_id_endpoint(table_name, sample_id)).
+        @stub = stub_request(:patch, described_class.list_endpoint(table_name, { id: sample_id })).
           to_return(
             status: 200,
             body: [request_body].to_json
@@ -204,7 +204,7 @@ RSpec.describe SupabaseApi::Client do
       subject { described_class.new.destroy(table_name, sample_id) }
 
       before do
-        @stub = stub_request(:delete, described_class.filtered_by_id_endpoint(table_name, sample_id)).
+        @stub = stub_request(:delete, described_class.list_endpoint(table_name, { id: sample_id })).
           to_return(
             status: 204,
             body: nil

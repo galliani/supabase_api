@@ -36,12 +36,7 @@ module SupabaseApi
     end
 
     def find(table_name, id)
-      self.class.get(
-        self.class.filtered_by_id_endpoint(table_name, id),
-        headers: @headers.merge({
-          'Range': '0-9'
-        })
-      )
+      list(table_name, { id: id })
     end
 
     def create(table_name, body)
@@ -57,7 +52,7 @@ module SupabaseApi
 
     def update(table_name, id, body)
       self.class.patch(
-        self.class.filtered_by_id_endpoint(table_name, id),
+        self.class.list_endpoint(table_name, { id: id }),
         body:     body.to_json,
         headers:  @headers.merge({
           'Content-Type': 'application/json',
@@ -68,11 +63,7 @@ module SupabaseApi
 
     def destroy(table_name, id)
       self.class.delete(
-        self.class.filtered_by_id_endpoint(table_name, id),
-        headers:  @headers.merge({
-          'Content-Type': 'application/json',
-          'Prefer':       'return=representation'
-        })
+        self.class.list_endpoint(table_name, { id: id })
       )      
     end
 
@@ -93,9 +84,5 @@ module SupabaseApi
 
       url + '&' + adjusted_query_string
     end
-
-    def self.filtered_by_id_endpoint(table_name, id)
-      "#{list_endpoint(table_name)}&id=eq.#{id}"
-    end    
   end
 end
